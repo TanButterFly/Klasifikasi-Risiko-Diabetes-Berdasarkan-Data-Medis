@@ -1,0 +1,73 @@
+Akurasi Model A (tanpa batasan): 0.7619
+Akurasi Model B (max_depth=3): 0.7273
+Model terbaik: Model A (unpruned)
+ROC AUC Model B: 0.7805
+
+Aturan Pohon Keputusan (Model B):
+|--- glukosa <= 132.50
+|   |--- usia <= 29.50
+|   |   |--- BMI <= 45.40
+|   |   |   |--- fungsi_silsilah_diabetes <= 0.51
+|   |   |   |   |--- kehamilan <= 7.50
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- kehamilan >  7.50
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- fungsi_silsilah_diabetes >  0.51
+|   |   |   |   |--- BMI <= 30.45
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- BMI >  30.45
+|   |   |   |   |   |--- class: 0
+|   |   |--- BMI >  45.40
+|   |   |   |--- insulin <= 230.00
+|   |   |   |   |--- class: 1
+|   |   |   |--- insulin >  230.00
+|   |   |   |   |--- class: 0
+|   |--- usia >  29.50
+|   |   |--- BMI <= 26.90
+|   |   |   |--- BMI <= 9.65
+|   |   |   |   |--- class: 1
+|   |   |   |--- BMI >  9.65
+|   |   |   |   |--- class: 0
+|   |   |--- BMI >  26.90
+|   |   |   |--- fungsi_silsilah_diabetes <= 0.56
+|   |   |   |   |--- kehamilan <= 1.50
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- kehamilan >  1.50
+|   |   |   |   |   |--- class: 0
+|   |   |   |--- fungsi_silsilah_diabetes >  0.56
+|   |   |   |   |--- kehamilan <= 8.50
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- kehamilan >  8.50
+|   |   |   |   |   |--- class: 1
+|--- glukosa >  132.50
+|   |--- glukosa <= 154.50
+|   |   |--- BMI <= 29.95
+|   |   |   |--- usia <= 50.50
+|   |   |   |   |--- kehamilan <= 9.00
+|   |   |   |   |   |--- class: 0
+|   |   |   |   |--- kehamilan >  9.00
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- usia >  50.50
+|   |   |   |   |--- class: 0
+|   |   |--- BMI >  29.95
+|   |   |   |--- tekanan_darah <= 61.00
+|   |   |   |   |--- class: 1
+|   |   |   |--- tekanan_darah >  61.00
+|   |   |   |   |--- BMI <= 45.55
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- BMI >  45.55
+|   |   |   |   |   |--- class: 1
+|   |--- glukosa >  154.50
+|   |   |--- BMI <= 23.10
+|   |   |   |--- class: 0
+|   |   |--- BMI >  23.10
+|   |   |   |--- kehamilan <= 6.50
+|   |   |   |   |--- usia <= 36.50
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- usia >  36.50
+|   |   |   |   |   |--- class: 1
+|   |   |   |--- kehamilan >  6.50
+|   |   |   |   |--- fungsi_silsilah_diabetes <= 0.21
+|   |   |   |   |   |--- class: 1
+|   |   |   |   |--- fungsi_silsilah_diabetes >  0.21
+|   |   |   |   |   |--- class: 1

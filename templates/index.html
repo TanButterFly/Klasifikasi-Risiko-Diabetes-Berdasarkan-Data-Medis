@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Risiko Diabetes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* 🌙 Dark Mode */
+        body.dark-mode {
+            background-color: #121212 !important;
+            color: #f1f1f1 !important;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e !important;
+            color: #f1f1f1;
+            border: 1px solid #444;
+        }
+        .dark-mode .form-control,
+        .dark-mode .form-select {
+            background-color: #2b2b2b !important;
+            color: #f1f1f1 !important;
+            border: 1px solid #555;
+        }
+        .dark-mode .table {
+            color: #f1f1f1;
+        }
+        .dark-mode .table-light {
+            background-color: #333 !important;
+        }
+
+        /* Tombol dark mode */
+        #darkModeToggle {
+            position: fixed;
+            top: 20px;
+            right: 25px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 15px;
+            cursor: pointer;
+            z-index: 999;
+        }
+        #darkModeToggle:hover {
+            background: #0b5ed7;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- 🌙 Dark Mode Toggle -->
+<button id="darkModeToggle">🌙 Mode Gelap</button>
+
+<div class="container mt-5">
+    <div class="card shadow-lg p-4 rounded-4">
+        <h2 class="text-center mb-4 text-primary">
+            🩺 Klasifikasi Risiko Diabetes Berdasarkan Data Medis<br>
+            <small class="text-muted fs-5">Menggunakan Algoritma Decision Tree</small>
+        </h2>
+
+        <!-- 🔽 DROPDOWN PILIH DATASET -->
+        <div class="mb-4">
+            <label class="fw-bold">Pilih Data dari Dataset:</label>
+            <select id="datasetSelect" class="form-select">
+                <option value="">-- Pilih Nomor Dataset --</option>
+                {% for i in dataset_options %}
+                <option value="{{ i }}">Dataset ke-{{ i }}</option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">Pilih salah satu data untuk mengisi otomatis form di bawah.</small>
+        </div>
+
+        <!-- 🔍 PREVIEW DATASET TERPILIH -->
+        <div id="previewContainer" class="mt-3" style="display:none;">
+            <h6 class="fw-bold text-secondary mb-2">📋 Preview Data Terpilih:</h6>
+            <table class="table table-bordered table-sm align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Kehamilan</th><th>Glukosa</th><th>Tekanan Darah</th>
+                        <th>Ketebalan Kulit</th><th>Insulin</th><th>BMI</th>
+                        <th>Fungsi Silsilah</th><th>Usia</th><th>Hasil</th>
+                    </tr>
+                </thead>
+                <tbody><tr id="previewRow"></tr></tbody>
+            </table>
+        </div>
+
+        <!-- 🧾 FORM INPUT DATA -->
+        <form action="/predict" method="POST" id="predictForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label>Kehamilan</label>
+                    <input type="number" step="any" class="form-control" name="kehamilan" id="kehamilan" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Glukosa</label>
+                    <input type="number" step="any" class="form-control" name="glukosa" id="glukosa" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Tekanan Darah</label>
+                    <input type="number" step="any" class="form-control" name="tekanan_darah" id="tekanan_darah" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Ketebalan Kulit</label>
+                    <input type="number" step="any" class="form-control" name="ketebalan_kulit" id="ketebalan_kulit" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Insulin</label>
+                    <input type="number" step="any" class="form-control" name="insulin" id="insulin" required>
+                </div>
+                <div class="col-md-3">
+                    <label>BMI</label>
+                    <input type="number" step="any" class="form-control" name="BMI" id="BMI" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Fungsi Silsilah Diabetes</label>
+                    <input type="number" step="any" class="form-control" name="fungsi_silsilah_diabetes" id="fungsi_silsilah_diabetes" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Usia</label>
+                    <input type="number" step="any" class="form-control" name="usia" id="usia" required>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-primary px-4" id="submitBtn" type="submit">Prediksi</button>
+            </div>
+        </form>
+
+        <!-- 🧠 HASIL PREDIKSI -->
+        {% if prediction_text %}
+        <div class="alert alert-{{ color }} text-center mt-4 fs-5">
+            <strong>{{ prediction_text }}</strong><br>
+            {{ probability_text }}
+            <div class="mt-2">
+                {% if color == 'danger' %}
+                    <em>⚠️ Saran: Segera konsultasikan dengan dokter dan jaga pola makan sehat.</em>
+                {% else %}
+                    <em>💪 Pertahankan gaya hidup sehat dan aktif!</em>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 📊 VISUALISASI GRAFIK -->
+        {% if bar_chart_file or gauge_json or pie_json %}
+        <div class="row mt-4">
+            {% if bar_chart_file %}
+            <div class="col-md-4 text-center mb-3">
+                <h6>📊 Bar Chart Probabilitas</h6>
+                <img src="{{ url_for('static', filename=bar_chart_file) }}" class="img-fluid rounded shadow-sm">
+            </div>
+            {% endif %}
+            {% if gauge_json %}
+            <div class="col-md-4 text-center mb-3">
+                <h6>🎯 Gauge Chart Risiko Diabetes</h6>
+                <div id="gauge"></div>
+            </div>
+            {% endif %}
+            {% if pie_json %}
+            <div class="col-md-4 text-center mb-3">
+                <h6>🧩 Pie Chart Risiko Diabetes</h6>
+                <div id="pie"></div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- 🌳 VISUALISASI POHON KEPUTUSAN -->
+        {% if tree_plot_file %}
+        <div class="mt-5 text-center">
+            <h5 class="text-primary mb-3">🌳 Visualisasi Pohon Keputusan</h5>
+            <img src="{{ url_for('static', filename=tree_plot_file) }}"
+                 class="img-fluid rounded shadow-lg border border-2 border-primary">
+        </div>
+        {% endif %}
+
+        <!-- 🧠 Penjelasan Algoritma -->
+        <div class="accordion mt-5" id="infoAlgoritma">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfo">
+                        📘 Apa itu Decision Tree?
+                    </button>
+                </h2>
+                <div id="collapseInfo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        Decision Tree adalah model pembelajaran mesin yang bekerja dengan membagi data menjadi cabang-cabang berdasarkan kondisi tertentu hingga menghasilkan keputusan akhir.
+                        Setiap cabang mewakili pertanyaan seperti <em>“Apakah glukosa &gt; 120?”</em> dan hasil akhirnya berupa <strong>“Ya/Tidak”</strong> terhadap risiko diabetes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // === Tooltip Bootstrap ===
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
+
+    // === Dropdown Dataset ===
+    const datasetSelect = document.getElementById("datasetSelect");
+    const previewContainer = document.getElementById("previewContainer");
+    const previewRow = document.getElementById("previewRow");
+
+    datasetSelect.addEventListener("change", async function () {
+        const rowId = this.value;
+        if (!rowId) {
+            document.querySelectorAll("#predictForm input").forEach(inp => inp.value = "");
+            previewContainer.style.display = "none";
+            return;
+        }
+        const res = await fetch(`/get_dataset/${rowId}`);
+        const data = await res.json();
+        if (data.error) { alert(data.error); return; }
+
+        document.getElementById("kehamilan").value = data.kehamilan ?? data.Pregnancies ?? "";
+        document.getElementById("glukosa").value = data.glukosa ?? data.Glucose ?? "";
+        document.getElementById("tekanan_darah").value = data.tekanan_darah ?? data.BloodPressure ?? "";
+        document.getElementById("ketebalan_kulit").value = data.ketebalan_kulit ?? data.SkinThickness ?? "";
+        document.getElementById("insulin").value = data.insulin ?? data.Insulin ?? "";
+        document.getElementById("BMI").value = data.BMI ?? "";
+        document.getElementById("fungsi_silsilah_diabetes").value = data.fungsi_silsilah_diabetes ?? data.DiabetesPedigreeFunction ?? "";
+        document.getElementById("usia").value = data.usia ?? data.Age ?? "";
+        previewContainer.style.display = "block";
+        previewRow.innerHTML = `
+            <td>${data.kehamilan ?? data.Pregnancies ?? "-"}</td>
+            <td>${data.glukosa ?? data.Glucose ?? "-"}</td>
+            <td>${data.tekanan_darah ?? data.BloodPressure ?? "-"}</td>
+            <td>${data.ketebalan_kulit ?? data.SkinThickness ?? "-"}</td>
+            <td>${data.insulin ?? data.Insulin ?? "-"}</td>
+            <td>${data.BMI ?? "-"}</td>
+            <td>${data.fungsi_silsilah_diabetes ?? data.DiabetesPedigreeFunction ?? "-"}</td>
+            <td>${data.usia ?? data.Age ?? "-"}</td>
+            <td>${data.hasil ?? data.Outcome ?? "-"}</td>`;
+    });
+
+    // 🌀 Loading Button
+    const form = document.getElementById("predictForm");
+    const submitBtn = document.getElementById("submitBtn");
+    form.addEventListener("submit", () => {
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+        submitBtn.disabled = true;
+    });
+
+    // 🌙 Dark Mode Toggle
+    const toggleBtn = document.getElementById("darkModeToggle");
+    toggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        toggleBtn.textContent = document.body.classList.contains("dark-mode") ? "☀️ Mode Terang" : "🌙 Mode Gelap";
+    });
+
+    // === Render Plotly Chart ===
+    {% if gauge_json %}
+    var gaugeData = {{ gauge_json | safe }};
+    Plotly.newPlot('gauge', gaugeData.data, gaugeData.layout);
+    {% endif %}
+    {% if pie_json %}
+    var pieData = {{ pie_json | safe }};
+    Plotly.newPlot('pie', pieData.data, pieData.layout);
+    {% endif %}
+});
+</script>
+</body>
+</html>

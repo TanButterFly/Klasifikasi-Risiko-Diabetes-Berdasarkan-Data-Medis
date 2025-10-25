@@ -1,0 +1,118 @@
+/* ===================================================
+   File: style.css
+   Aplikasi: Prediksi Risiko Diabetes (Flask + Bootstrap)
+   =================================================== */
+
+/* --- 1. GENERAL STYLING & FONT --- */
+body {
+    background-color: #f4f7f6; /* Soft off-white background */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 30px;
+    padding-bottom: 50px;
+}
+
+/* --- 2. CARD & FORM LAYOUT --- */
+.card {
+    border: none;
+    border-radius: 16px; /* Lebih bulat */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Soft, elegan shadow */
+}
+
+.card h2 {
+    font-weight: 700;
+    color: #007bff; /* Primary blue for title */
+}
+
+/* Input Fields */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    height: 45px; /* Standar tinggi input */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+    border-color: #0056b3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Labels */
+label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+/* Submit Button */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: 600;
+    padding: 10px 30px;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px); /* Efek sedikit terangkat */
+}
+
+/* --- 3. PREDICTION RESULT ALERT (Alert Bootstrap Customization) --- */
+.alert {
+    border-radius: 10px;
+    border-width: 2px;
+    font-weight: 500;
+    transition: all 0.5s ease;
+}
+
+/* Warning (Risiko Tinggi / Diabetes) */
+.alert-warning {
+    background-color: #ffeadb; /* Light Coral/Orange background */
+    color: #d89600; /* Darker orange text */
+    border-color: #ff9900;
+}
+
+/* Success (Risiko Rendah / Tidak Diabetes) */
+.alert-success {
+    background-color: #e6ffed; /* Light Green background */
+    color: #1e7e34; /* Darker green text */
+    border-color: #1e7e34;
+}
+
+/* Danger (Error) */
+.alert-danger {
+    background-color: #fddfdf; /* Light Red background */
+    color: #dc3545; /* Darker red text */
+    border-color: #dc3545;
+}
+
+.alert strong {
+    font-size: 1.25rem;
+}
+
+/* --- 4. CHART AREA STYLING --- */
+.row.mt-4 {
+    border-top: 1px solid #e9ecef;
+    padding-top: 20px;
+    margin-top: 20px !important;
+}
+
+.col-md-4 h6 {
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 15px;
+}
+
+/* Styling untuk grafik Matplotlib yang disimpan sebagai gambar */
+.img-fluid.rounded.shadow-sm {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Styling untuk container Plotly (Gauge & Pie) */
+#gauge, #pie {
+    /* Pastikan container Plotly memiliki dimensi */
+    height: 250px; 
+    width: 100%;
+}
